@@ -78,7 +78,7 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 containerMovements.innerHTML = '';
 
 const hienThiGiaoDich = function (mov) {
-  mov.forEach(function (el, i) {
+  mov.movements.forEach(function (el, i) {
     const type = el > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
@@ -89,28 +89,28 @@ const hienThiGiaoDich = function (mov) {
 };
 
 const tinhTongSoDu = function (arr) {
-  const total = arr.reduce(function (total, value) {
+  const total = arr.movements.reduce(function (total, value) {
     return total + value;
   });
 
   labelBalance.innerHTML = `${total}€`;
 };
 
-const hienSumary = function (mov,laiSuat) {
-  const deposit = mov
+const hienSumary = function (mov) {
+  const deposit = mov.movements
     .filter(item => item > 0)
     .reduce((acc, item) => acc + item);
   labelSumIn.innerHTML = `${deposit}€`;
-  const withdrawal = mov
+  const withdrawal = mov.movements
     .filter(item => item < 0)
     .reduce((acc, item) => acc + item);
   labelSumOut.innerHTML = `${Math.abs(withdrawal)}€`;
 
   
 
-  const interest = mov
+  const interest = mov.movements
     .filter(item => item > 0)
-    .map(item => (item * laiSuat) / 100)
+    .map(item => (item *mov.interestRate) / 100)
     .filter(item => item > 1)
     .reduce((acc, item) => acc + item);
   labelSumInterest.innerHTML = `${interest}€`;
@@ -150,14 +150,15 @@ btnLogin.addEventListener('click', function (e) {
 
     labelWelcome.textContent = `Welcome ${user.owner.split(' ')[0]}`;
 
-    hienSumary(user.movements,user.interestRate);
-    hienThiGiaoDich(user.movements);
-    tinhTongSoDu(user.movements);
+    hienSumary(user,user.interestRate);
+    hienThiGiaoDich(user);
+    tinhTongSoDu(user);
 
   
     btnTransfer.addEventListener('click',function(){
       let accountsReceive=inputTransferTo;
       let amount=inputTransferAmount;
+      
 
 
 
