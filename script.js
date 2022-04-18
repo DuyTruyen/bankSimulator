@@ -89,11 +89,12 @@ const hienThiGiaoDich = function (mov) {
 };
 
 const tinhTongSoDu = function (arr) {
-  const total = arr.movements.reduce(function (total, value) {
-    return total + value;
+  arr.forEach(function (arr1, i) {
+    const total = arr1.movements.reduce(function (total, value) {
+      return total + value;
+    });
+    arr1.balance = total;
   });
-
-  labelBalance.innerHTML = `${total}€`;
 };
 
 const hienSumary = function (mov) {
@@ -106,19 +107,19 @@ const hienSumary = function (mov) {
     .reduce((acc, item) => acc + item);
   labelSumOut.innerHTML = `${Math.abs(withdrawal)}€`;
 
-  
-
   const interest = mov.movements
     .filter(item => item > 0)
-    .map(item => (item *mov.interestRate) / 100)
+    .map(item => (item * mov.interestRate) / 100)
     .filter(item => item > 1)
     .reduce((acc, item) => acc + item);
   labelSumInterest.innerHTML = `${interest}€`;
 
-  console.log(deposit);
+  const total = deposit - Math.abs(withdrawal);
+
+  labelBalance.innerHTML = `${total}€`;
+
+  // console.log(deposit);
 };
-
-
 
 function taoUserName(i) {
   i.forEach(function (el, index) {
@@ -131,7 +132,7 @@ function taoUserName(i) {
       .join('');
   });
 }
-
+tinhTongSoDu(accounts);
 taoUserName(accounts);
 console.log(accounts);
 
@@ -142,37 +143,44 @@ btnLogin.addEventListener('click', function (e) {
   const pin = inputLoginPin.value;
 
   const user = accounts.find(acc => acc.username == username);
-
-
-
+  function capNhatGiaoDien(user) {
+    hienSumary(user);
+    hienThiGiaoDich(user);
+    // tinhTongSoDu(accounts[user]);
+  }
   if (pin == user.pin) {
     containerApp.style.opacity = 100;
+    inputLoginUsername.innerHTML=inputLoginPin.innerHTML='';
 
     labelWelcome.textContent = `Welcome ${user.owner.split(' ')[0]}`;
 
-    hienSumary(user,user.interestRate);
-    hienThiGiaoDich(user);
-    tinhTongSoDu(user);
+    capNhatGiaoDien(user);
 
-  
-    btnTransfer.addEventListener('click',function(){
-      let accountsReceive=inputTransferTo;
-      let amount=inputTransferAmount;
-      
+    btnTransfer.addEventListener('click', function (e) {
+      // console.log(e);
+
+      e.preventDefault();
+      let accountsReceive = inputTransferTo.value;
+      let amount = Number(inputTransferAmount.value);
+
+      console.log(accounts.find(acc => acc.username == accountsReceive));
+
+      const us = accounts.find(acc => acc.username == accountsReceive);
+
+      if (us && user.balance >= amount && amount > 0) {
+        us.balance += amount;
+        user.balance -= amount;
+        user.movements.push(-amount);
+        us.movements.push(amount);
 
 
-
-
-
-    })
-  
-
-
+        console.log(us.balance, user.balance);
+      }
+      capNhatGiaoDien(user);
+    });
   }
-
-  console.log(user);
 });
-
+console.log(accounts);
 // let currentAccount;
 // btnLogin.addEventListener('click', function (e) {
 //   // Prevent form from submitting
@@ -225,3 +233,19 @@ btnLogin.addEventListener('click', function (e) {
 // }
 
 // console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));
+
+
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+  ];
+
+
+  dogs.forEach(function(value,index){
+    
+    value.recommendedFood = Math.trunc(value.weight ** 0.75 * 28);
+  })
+  console.log(dogs);
+  
